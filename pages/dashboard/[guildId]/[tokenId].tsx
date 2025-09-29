@@ -3,6 +3,7 @@ import Logo from "../../../components/Logo";
 import SocialLinks from "../../../components/SocialLinks";
 import styles from "../../../styles/Dashboard.module.scss";
 import RedirectMessage from "../../../components/RedirectMessage"; // optional if you want same UI
+import { useState } from "react";
 
 import {
   setupDb,
@@ -39,6 +40,42 @@ const DashboardPage: NextPage<DashboardPageProps> = ({
   discordServerIcon,
   error,
 }) => {
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+
+  const handleAnalyticsAccess = async () => {
+    setIsLoadingAnalytics(true);
+    setAnalyticsError(null);
+
+    try {
+      const response = await fetch("/api/dashboard/analytics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          guildId,
+          dashboardToken: token,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to access analytics");
+      }
+
+      // Redirect to analytics page
+      window.location.href = data.analyticsUrl;
+    } catch (error) {
+      console.error("Error accessing analytics:", error);
+      setAnalyticsError(
+        error instanceof Error ? error.message : "Failed to access analytics"
+      );
+    } finally {
+      setIsLoadingAnalytics(false);
+    }
+  };
   if (error == "Invalid or expired token.") {
     return (
       <RedirectMessage
@@ -67,6 +104,26 @@ const DashboardPage: NextPage<DashboardPageProps> = ({
         discordServerName={discordServerName!}
         discordServerIcon={discordServerIcon}
       />
+      
+      {/* Analytics Access Section */}
+      <section className={styles.configSection}>
+        <h3>Analytics</h3>
+        <div className={styles.buttonGroup}>
+          <button
+            onClick={handleAnalyticsAccess}
+            disabled={isLoadingAnalytics}
+            className={styles.primaryButton}
+          >
+            {isLoadingAnalytics ? "Loading..." : "View Analytics"}
+          </button>
+        </div>
+        {analyticsError && (
+          <div className={styles.errorMessage}>
+            {analyticsError}
+          </div>
+        )}
+      </section>
+
       <section className={styles.configSection}>
         <h3>Configurations</h3>
         {configs.length > 0 ? (
