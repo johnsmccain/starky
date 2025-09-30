@@ -13,6 +13,7 @@ import { StarkyModuleConfig } from "../../../types/starkyModules";
 import { getDiscordServerInfo } from "../../../discord/utils";
 import Guild from "../../../components/guild/Guild";
 import { validateToken } from "../../../utils/validateToken";
+import Link from "next/link";
 
 interface Config {
   id: string;
@@ -39,11 +40,6 @@ const DashboardPage: NextPage<DashboardPageProps> = ({
   discordServerIcon,
   error,
 }) => {
-  const handleAnalyticsAccess = () => {
-    // Simply redirect to analytics page using the existing dashboard token
-    const analyticsUrl = `/analytics/${guildId}/${token}`;
-    window.location.href = analyticsUrl;
-  };
   if (error == "Invalid or expired token.") {
     return (
       <RedirectMessage
@@ -72,17 +68,13 @@ const DashboardPage: NextPage<DashboardPageProps> = ({
         discordServerName={discordServerName!}
         discordServerIcon={discordServerIcon}
       />
-      
-      {/* Analytics Access Section */}
+
       <section className={styles.configSection}>
         <h3>Analytics</h3>
         <div className={styles.buttonGroup}>
-          <button
-            onClick={handleAnalyticsAccess}
-            className={styles.primaryButton}
-          >
-            View Analytics
-          </button>
+          <Link href={`/analytics/${guildId}/${token}`}>
+            <button className={styles.primaryButton}>View Analytics</button>
+          </Link>
         </div>
       </section>
 
