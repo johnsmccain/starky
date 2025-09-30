@@ -25,11 +25,10 @@
     "indexer": false,
     "description": "The Ethereum mainnet",
     "verifyPage": "verify-eth"
-  }
-  ,
+  },
   {
-    "label": "Stellar",
-    "name": "stellar",
+    "label": "Stellar Mainnet",
+    "name": "stellar-mainnet",
     "url": "https://stellar.org",
     "explorerUrl": "https://stellar.expert/explorer/public",
     "currency": "XLM",
